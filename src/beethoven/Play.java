@@ -2,6 +2,7 @@ package beethoven;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,6 +20,8 @@ public class Play extends UiAutomatorTestCase {
 
   private static final int BLACK = Color.rgb(32, 32, 32);
 
+  private static final int Y = 700;
+
   public void testWakeUp() throws Exception {
     if (!getUiDevice().isScreenOn()) {
       getUiDevice().wakeUp();
@@ -30,22 +33,43 @@ public class Play extends UiAutomatorTestCase {
 //    getUiDevice().click(20, 700);
     assertTrue(new UiObject(VIEW).exists());
 
-    for (int i = 0; i < 50; i++) {
-      getUiDevice().click(nextX(), 650);
+    X x = new X();
+    while (x.hasNext()) {
+      getUiDevice().click(x.next(), Y);
     }
   }
 
-  private int nextX() {
-    Bitmap bmp = getBitmap();
-    StringBuilder colors = new StringBuilder();
-    for (int x = 90; x <= 720; x += 180) {
-      int pixel = bmp.getPixel(x, 650);
-      colors.append(color(pixel)).append(";");
-      if (pixel == BLACK) {
-        return x;
-      }
+  private class X implements Iterator<Integer> {
+
+    private int count = 0;
+    private int y = 0;
+    private Bitmap bmp;
+
+    public boolean hasNext() {
+      return count < 50;
     }
-    throw new AssertionError("No BLACK! " + colors);
+
+    public Integer next() {
+      count++;
+      if (y < 50) {
+        bmp = getBitmap();
+        y = Y;
+      }
+      StringBuilder colors = new StringBuilder();
+      for (int x = 90; x <= 720; x += 180) {
+        int pixel = bmp.getPixel(x, y);
+        colors.append(color(pixel)).append(";");
+        if (pixel == BLACK) {
+          y -= 300;
+          return x;
+        }
+      }
+      throw new AssertionError("No BLACK @ y=" + y + "! " + colors);
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException("Not supported!");
+    }
   }
 
   @SuppressWarnings("deprecation")
