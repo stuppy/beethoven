@@ -61,10 +61,8 @@ public class Play extends UiAutomatorTestCase {
       }
       int y = Y - mod * 300;
       count++;
-      StringBuilder colors = new StringBuilder();
       for (int x = 90; x <= 720; x += 180) {
         int pixel = bmp.getPixel(x, y);
-        colors.append(color(pixel)).append(";");
         if (pixel == BLACK) {
           new AsyncTask<Void, Void, Bitmap>() {
             @Override
@@ -78,6 +76,12 @@ public class Play extends UiAutomatorTestCase {
           };
           return x;
         }
+      }
+      // Delay until needed.
+      StringBuilder colors = new StringBuilder();
+      for (int x = 90; x <= 720; x += 180) {
+        int pixel = bmp.getPixel(x, y);
+        colors.append(color(pixel)).append(";");
       }
       throw new AssertionError("No BLACK @ y=" + y + "! " + colors);
     }
