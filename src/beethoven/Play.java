@@ -7,7 +7,6 @@ import java.util.Iterator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Looper;
 
 import com.android.uiautomator.core.UiObject;
@@ -64,16 +63,6 @@ public class Play extends UiAutomatorTestCase {
       for (int x = 90; x <= 720; x += 180) {
         int pixel = bmp.getPixel(x, y);
         if (pixel == BLACK) {
-          new AsyncTask<Void, Void, Bitmap>() {
-            @Override
-            protected Bitmap doInBackground(Void... args) {
-              return getBitmap();
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-            }
-          };
           return x;
         }
       }
