@@ -7,7 +7,6 @@ import java.util.Iterator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Looper;
 
 import com.android.uiautomator.core.UiObject;
 import com.android.uiautomator.core.UiSelector;
@@ -15,18 +14,17 @@ import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 
 public class Play extends UiAutomatorTestCase {
 
-  private static final UiSelector VIEW = new UiSelector()
-      .packageName("com.umonistudio.tile")
-      .className(android.view.View.class);
-
   private static final int BLACK = Color.rgb(32, 32, 32);
-
   private static final int Y = 700;
 
   public void testClassicPro() throws Exception {
-    assertTrue(new UiObject(VIEW).exists());
+    UiObject tile = new UiObject(
+        new UiSelector()
+            .packageName("com.umonistudio.tile")
+            .className(android.view.View.class));
+    assertTrue(tile.exists());
 
-    X x = new X();
+    X x = new X(50);
     while (x.hasNext()) {
       getUiDevice().click(x.next(), Y);
     }
@@ -34,15 +32,17 @@ public class Play extends UiAutomatorTestCase {
 
   private class X implements Iterator<Integer> {
 
+    private final int length;
+
     private int count = 0;
     private Bitmap bmp;
 
-    private X() {
-      Looper.prepare();
+    private X(int length) {
+      this.length = length;
     }
 
     public boolean hasNext() {
-      return count < 50;
+      return count < length;
     }
 
     public Integer next() {
