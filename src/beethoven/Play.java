@@ -23,14 +23,7 @@ public class Play extends UiAutomatorTestCase {
 
   private static final int Y = 700;
 
-  public void testWakeUp() throws Exception {
-    if (!getUiDevice().isScreenOn()) {
-      getUiDevice().wakeUp();
-    }
-    assertTrue(getUiDevice().isScreenOn());
-  }
-
-  public void testRandomClick() throws Exception {
+  public void testClassicPro() throws Exception {
     assertTrue(new UiObject(VIEW).exists());
 
     X x = new X();
