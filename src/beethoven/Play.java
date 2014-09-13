@@ -89,11 +89,7 @@ public class Play extends UiAutomatorTestCase {
       throw new RuntimeException(e);
     }
     screenshot.deleteOnExit();
-
     assertTrue(getUiDevice().takeScreenshot(screenshot, 1, 0));
-    assertTrue(screenshot.exists());
-    assertTrue(screenshot.isFile());
-
     return new BitmapDrawable(screenshot.getAbsolutePath()).getBitmap();
   }
 
