@@ -7,6 +7,8 @@ import java.util.Iterator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
+import android.os.Looper;
 
 import com.android.uiautomator.core.UiObject;
 import com.android.uiautomator.core.UiSelector;
@@ -42,25 +44,38 @@ public class Play extends UiAutomatorTestCase {
   private class X implements Iterator<Integer> {
 
     private int count = 0;
-    private int y = 0;
     private Bitmap bmp;
+
+    private X() {
+      Looper.prepare();
+    }
 
     public boolean hasNext() {
       return count < 50;
     }
 
     public Integer next() {
-      count++;
-      if (y < 50) {
+      int mod = count % 3;
+      if (mod == 0) {
         bmp = getBitmap();
-        y = Y;
       }
+      int y = Y - mod * 300;
+      count++;
       StringBuilder colors = new StringBuilder();
       for (int x = 90; x <= 720; x += 180) {
         int pixel = bmp.getPixel(x, y);
         colors.append(color(pixel)).append(";");
         if (pixel == BLACK) {
-          y -= 300;
+          new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... args) {
+              return getBitmap();
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+            }
+          };
           return x;
         }
       }
