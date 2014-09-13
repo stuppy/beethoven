@@ -31,7 +31,6 @@ public class Play extends UiAutomatorTestCase {
   }
 
   public void testRandomClick() throws Exception {
-//    getUiDevice().click(20, 700);
     assertTrue(new UiObject(VIEW).exists());
 
     X x = new X();
