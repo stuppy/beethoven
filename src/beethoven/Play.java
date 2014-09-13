@@ -58,8 +58,7 @@ public class Play extends UiAutomatorTestCase {
     }
     screenshot.deleteOnExit();
 
-    getUiDevice().takeScreenshot(screenshot, 1, 1);
-
+    assertTrue(getUiDevice().takeScreenshot(screenshot, 1, 1));
     assertTrue(screenshot.exists());
     assertTrue(screenshot.isFile());
 
