@@ -1,6 +1,7 @@
 package beethoven;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -49,10 +50,15 @@ public class Play extends UiAutomatorTestCase {
 
   @SuppressWarnings("deprecation")
   private Bitmap getBitmap() {
-    File screenshot = new File("/data/local/tmp/beethoven.png");
+    File screenshot;
+    try {
+      screenshot = File.createTempFile("beethoven", ".png");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     screenshot.deleteOnExit();
 
-    getUiDevice().takeScreenshot(screenshot);
+    getUiDevice().takeScreenshot(screenshot, 1, 1);
 
     assertTrue(screenshot.exists());
     assertTrue(screenshot.isFile());
