@@ -12,11 +12,24 @@ import com.android.uiautomator.core.UiObject;
 import com.android.uiautomator.core.UiSelector;
 import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 
+/**
+ * Play test case that "beats" the Classic Pro level.
+ */
 public class Play extends UiAutomatorTestCase {
 
+  /**
+   * For the purposes of white vs. black tile, this is "black."
+   */
   private static final int BLACK = Color.rgb(32, 32, 32);
+
+  /**
+   * Click row.
+   */
   private static final int Y = 700;
 
+  /**
+   * Test!
+   */
   public void testClassicPro() throws Exception {
     UiObject tile = new UiObject(
         new UiSelector()
@@ -30,8 +43,10 @@ public class Play extends UiAutomatorTestCase {
     }
   }
 
+  /**
+   * Iterates through the X values to click on at the {@link #Y} row.
+   */
   private class X implements Iterator<Integer> {
-
     private final int length;
 
     private int count = 0;
@@ -62,7 +77,7 @@ public class Play extends UiAutomatorTestCase {
       StringBuilder colors = new StringBuilder();
       for (int x = 90; x <= 720; x += 180) {
         int pixel = bmp.getPixel(x, y);
-        colors.append(color(pixel)).append(";");
+        colors.append(Utils.color(pixel)).append(";");
       }
       throw new AssertionError("No BLACK @ y=" + y + "! " + colors);
     }
@@ -72,7 +87,7 @@ public class Play extends UiAutomatorTestCase {
     }
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings("deprecation")  // BitmapDrawable contructor; Resources isn't available.
   private Bitmap getBitmap() {
     File screenshot;
     try {
@@ -83,17 +98,5 @@ public class Play extends UiAutomatorTestCase {
     screenshot.deleteOnExit();
     assertTrue(getUiDevice().takeScreenshot(screenshot, 1, 0));
     return new BitmapDrawable(screenshot.getAbsolutePath()).getBitmap();
-  }
-
-  private static String color(int pixel) {
-    return '#' + hex(Color.red(pixel)) + hex(Color.green(pixel)) + hex(Color.blue(pixel));
-  }
-
-  private static String hex(int color) {
-    String s = Integer.toString(color, 16);
-    if (s.length() == 1) {
-      s = '0' + s;
-    }
-    return s;
   }
 }
