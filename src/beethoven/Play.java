@@ -44,6 +44,24 @@ public class Play extends UiAutomatorTestCase {
   }
 
   /**
+   * Test!
+   */
+  public void ignore_testClassicPro() throws Exception {
+    UiObject tile = new UiObject(
+        new UiSelector()
+            .packageName("com.umonistudio.tile")
+            .className(android.view.View.class));
+    assertTrue(tile.exists());
+
+    for (int i = 0; i < 50; i++) {
+      for (int x = 90; x <= 720; x += 180) {
+        // Basically, this is definitely cheating.
+        getUiDevice().click(x, 970);
+      }
+    }
+  }
+
+  /**
    * Iterates through the X values to click on at the {@link #Y} row.
    */
   private class X implements Iterator<Integer> {
