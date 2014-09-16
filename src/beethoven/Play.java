@@ -7,6 +7,8 @@ import java.util.Iterator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
+import android.os.Looper;
 
 import com.android.uiautomator.core.UiObject;
 import com.android.uiautomator.core.UiSelector;
@@ -29,6 +31,8 @@ public class Play extends UiAutomatorTestCase {
 
   /**
    * Test!
+   *
+   * <p>This one uses screenshots to pinpoint the location of the next tile!
    */
   public void testClassicPro() throws Exception {
     UiObject tile = new UiObject(
@@ -45,6 +49,8 @@ public class Play extends UiAutomatorTestCase {
 
   /**
    * Test!
+   *
+   * <p>This one is basically mashing buttons.
    */
   public void ignore_testClassicPro() throws Exception {
     UiObject tile = new UiObject(
@@ -53,11 +59,19 @@ public class Play extends UiAutomatorTestCase {
             .className(android.view.View.class));
     assertTrue(tile.exists());
 
-    for (int i = 0; i < 50; i++) {
-      for (int x = 90; x <= 720; x += 180) {
-        // Basically, this is definitely cheating.
-        getUiDevice().click(x, 970);
+    Looper.prepare();
+    // Only one async task is executed in the background at a time, apparently?
+    new AsyncTask<Void, Void, Void>() {
+      @Override
+      protected Void doInBackground(Void... args) {
+        for (int i = 0; i < 100; i++) {
+          getUiDevice().click(185, 970);
+        }
+        return null;
       }
+    }.execute();
+    for (int i = 0; i < 100; i++) {
+      getUiDevice().click(535, 970);
     }
   }
 
