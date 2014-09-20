@@ -99,24 +99,72 @@ public class Play extends UiAutomatorTestCase {
    * slow (300+ ms).
    */
   private Bitmap takeScreenshot() {
-    try {
-      UiDevice device = UiDevice.getInstance();
+    return new SuperObject(UiDevice.getInstance())
+        .call("getAutomatorBridge")
+        .get("mUiAutomation")
+        .call("takeScreenshot")
+        .to(Bitmap.class);
+  }
 
-      Method getAutomatorBridge = device.getClass().getDeclaredMethod("getAutomatorBridge");
-      getAutomatorBridge.setAccessible(true);
-      Object automatorBridge = getAutomatorBridge.invoke(device);
+  private static class SuperObject {
+    private final Object object;
 
-      // UiAutomatorBridge is abstract, so use the super class (UiAutomatorBridge).
-      Field mUiAutomation =
-          automatorBridge.getClass().getSuperclass().getDeclaredField("mUiAutomation");
-      mUiAutomation.setAccessible(true);
-      Object uiAutomation = mUiAutomation.get(automatorBridge);
+    private SuperObject(Object object) {
+      this.object = object;
+    }
 
-      Method takeScreenshot = uiAutomation.getClass().getDeclaredMethod("takeScreenshot");
-      takeScreenshot.setAccessible(true);
-      return (Bitmap) takeScreenshot.invoke(uiAutomation);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    private <T> T to(Class<T> clazz) {
+      return clazz.cast(object);
+    }
+
+    private SuperObject call(String method, Object... args) {
+      Method m;
+      Class<?> c = object.getClass();
+      do {
+        try {
+          m = c.getDeclaredMethod(method);
+          break;
+        } catch (NoSuchMethodException e) {
+          if (c.getSuperclass() != null) {
+            c = c.getSuperclass();
+          } else {
+            throw new RuntimeException(e);
+          }
+        }
+      } while(true);
+      m.setAccessible(true);
+      try {
+        return new SuperObject(m.invoke(object, args));
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    private SuperObject get(String name) {
+      Field f;
+      Class<?> c = object.getClass();
+      do {
+        try {
+          f = c.getDeclaredField(name);
+          break;
+        } catch (NoSuchFieldException e) {
+          if (c.getSuperclass() != null) {
+            c = c.getSuperclass();
+          } else {
+            throw new RuntimeException(e);
+          }
+        }
+      } while(true);
+      f.setAccessible(true);
+      try {
+        return new SuperObject(f.get(object));
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 }
