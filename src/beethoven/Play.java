@@ -90,13 +90,13 @@ public class Play extends UiAutomatorTestCase {
   }
 
   /**
-   * Take a screenshot.
+   * Takes a screenshot in ~ 16ms (basically, one frame).
    *
    * <p>The basic call chain is:
    * UiDevice.getInstance().getAutomatorBridge().mUiAutomation.takeScreenshot()
    *
    * <p>This is a super hack that uses private/hidden methods to avoid creating a file, which is
-   * slow.
+   * slow (300+ ms).
    */
   private Bitmap takeScreenshot() {
     try {
