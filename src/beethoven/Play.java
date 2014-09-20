@@ -106,6 +106,7 @@ public class Play extends UiAutomatorTestCase {
       getAutomatorBridge.setAccessible(true);
       Object automatorBridge = getAutomatorBridge.invoke(device);
 
+      // UiAutomatorBridge is abstract, so use the super class (UiAutomatorBridge).
       Field mUiAutomation =
           automatorBridge.getClass().getSuperclass().getDeclaredField("mUiAutomation");
       mUiAutomation.setAccessible(true);
