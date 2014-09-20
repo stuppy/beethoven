@@ -1,15 +1,13 @@
 package beethoven;
 
-import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
-import android.os.Looper;
 
+import com.android.uiautomator.core.UiDevice;
 import com.android.uiautomator.core.UiObject;
 import com.android.uiautomator.core.UiSelector;
 import com.android.uiautomator.testrunner.UiAutomatorTestCase;
@@ -48,34 +46,6 @@ public class Play extends UiAutomatorTestCase {
   }
 
   /**
-   * Test!
-   *
-   * <p>This one is basically mashing buttons.
-   */
-  public void ignore_testClassicPro() throws Exception {
-    UiObject tile = new UiObject(
-        new UiSelector()
-            .packageName("com.umonistudio.tile")
-            .className(android.view.View.class));
-    assertTrue(tile.exists());
-
-    Looper.prepare();
-    // Only one async task is executed in the background at a time, apparently?
-    new AsyncTask<Void, Void, Void>() {
-      @Override
-      protected Void doInBackground(Void... args) {
-        for (int i = 0; i < 100; i++) {
-          getUiDevice().click(185, 970);
-        }
-        return null;
-      }
-    }.execute();
-    for (int i = 0; i < 100; i++) {
-      getUiDevice().click(535, 970);
-    }
-  }
-
-  /**
    * Iterates through the X values to click on at the {@link #Y} row.
    */
   private class X implements Iterator<Integer> {
@@ -95,7 +65,7 @@ public class Play extends UiAutomatorTestCase {
     public Integer next() {
       int mod = count % 3;
       if (mod == 0) {
-        bmp = getBitmap();
+        bmp = takeScreenshot();
       }
       int y = Y - mod * 300;
       count++;
@@ -119,16 +89,33 @@ public class Play extends UiAutomatorTestCase {
     }
   }
 
-  @SuppressWarnings("deprecation")  // BitmapDrawable contructor; Resources isn't available.
-  private Bitmap getBitmap() {
-    File screenshot;
+  /**
+   * Take a screenshot.
+   *
+   * <p>The basic call chain is:
+   * UiDevice.getInstance().getAutomatorBridge().mUiAutomation.takeScreenshot()
+   *
+   * <p>This is a super hack that uses private/hidden methods to avoid creating a file, which is
+   * slow.
+   */
+  private Bitmap takeScreenshot() {
     try {
-      screenshot = File.createTempFile("beethoven", ".png");
-    } catch (IOException e) {
+      UiDevice device = UiDevice.getInstance();
+
+      Method getAutomatorBridge = device.getClass().getDeclaredMethod("getAutomatorBridge");
+      getAutomatorBridge.setAccessible(true);
+      Object automatorBridge = getAutomatorBridge.invoke(device);
+
+      Field mUiAutomation =
+          automatorBridge.getClass().getSuperclass().getDeclaredField("mUiAutomation");
+      mUiAutomation.setAccessible(true);
+      Object uiAutomation = mUiAutomation.get(automatorBridge);
+
+      Method takeScreenshot = uiAutomation.getClass().getDeclaredMethod("takeScreenshot");
+      takeScreenshot.setAccessible(true);
+      return (Bitmap) takeScreenshot.invoke(uiAutomation);
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    screenshot.deleteOnExit();
-    assertTrue(getUiDevice().takeScreenshot(screenshot, 1, 0));
-    return new BitmapDrawable(screenshot.getAbsolutePath()).getBitmap();
   }
 }
